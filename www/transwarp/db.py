@@ -43,7 +43,7 @@ def create_engine(user, password, database, host='127.0.0.1', port=3306):
         buffered=True)
     params.update(defaults)
     # lambda 定义函数
-    engine = _Engine(lambda: mysql.connector.connect(params))
+    engine = _Engine(lambda: mysql.connector.connect(**params))
     logging.info('engine %s is created' % hex(id(engine)))
 
 
@@ -70,28 +70,29 @@ class _DbCtx(threading.local):
 _db_ctx = _DbCtx()
 
 class _LazyConnection(object):
+
     def __init__(self):
-        self.__connection = None
+        self.connection = None
 
     def cursor(self):
-        if not self.__connection:
+        if self.connection is None:
             connection = engine.connect()
             logging.info('open connection <%s>...' % hex(id(connection)))
-            self.__connection = connection
-        return self.__connection.cursor()
-
-    def cleanup(self):
-        if self.__connection:
-            connection = self.__connection
-            self.__connection = None
-            logging.info('closing connection <%s>...' %hex(id(connection)))
-            connection.close()
+            self.connection = connection
+        return self.connection.cursor()
 
     def commit(self):
-        self.__connection.commit()
+        self.connection.commit()
 
     def rollback(self):
-        self.__connection.rollback()
+        self.connection.rollback()
+
+    def cleanup(self):
+        if self.connection is not None:
+            connection = self.connection
+            self.connection = None
+            logging.info('close connection <%s>...' % hex(id(connection)))
+            connection.close()
 
 class _ConnectionCtx(object):
     def __enter__(self):
@@ -112,9 +113,9 @@ def connection():
 
 def with_connection(func):
     @functools.wraps(func)
-    def wrapper(sql, *args):
+    def wrapper(*args, **kw):
         with connection():
-            func(sql, *args)
+            func(*args, **kw)
     return wrapper
 
 def __select(sql, first, *args):
@@ -155,7 +156,7 @@ def select_int(sql, *args):
         raise MultiColumnsError('Expect only one column.')
     return d.values()[0]
 
-def __update(sql,*args):
+def __update(sql, *args):
     global _db_ctx
     cursor = None
     sql = sql.replace('?','%s')
