@@ -1,15 +1,22 @@
-import uuid, time
-def next_id(t=None):
-    '''
-    Return next id as 50-char string.
-    Args:
-        t: unix timestamp, default to None and using time.time().
-    '''
-    if t is None:
-        t = time.time()
-    return '%015d %s 000' % (int(t * 1000), uuid.uuid4().hex)
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-domain = uuid.uuid3(uuid.NAMESPACE_DNS,'crose.com')
-post = uuid.uuid3(domain,'what-is-a-metaclass-in-python')
-print uuid.NAMESPACE_DNS
-print domain,post
+from models import User, Blog, Comment
+
+from transwarp import db
+
+db.create_engine(user='www-data', password='www-data', database='awesome')
+
+u = User(name='Test', email='test@example.com', password='1234567890', image='about:blank')
+
+u.insert()
+
+print 'new user id:', u.id
+
+u1 = User.find_first('where email=?', 'test@example.com')
+print 'find user\'s name:', u1.name
+
+u1.delete()
+
+u2 = User.find_first('where email=?', 'test@example.com')
+print 'find user:', u2
