@@ -1,6 +1,6 @@
 # coding:utf-8
 import functools
-import logging, threading
+import logging, threading, time, uuid
 import mysql.connector
 
 class Dict(dict):
