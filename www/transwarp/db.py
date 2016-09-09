@@ -145,16 +145,12 @@ def __select(sql, first, *args):
         cursor = _db_ctx.cursor()
         cursor.execute(sql,args)
         if cursor.description:
-            print cursor.description
             names = [x[0] for x in cursor.description]
         if first:
             values = cursor.fetchone()
-            print names,values
-            print values is not None
             if values is None:
                 return None
             return Dict(names,values)
-        print "hahah"
         return [Dict(name,x) for x in cursor.fetchall()]
     finally:
         if cursor:
@@ -171,7 +167,6 @@ def select_one(sql, *args):
 
 def select_int(sql, *args):
     d = __select(sql, True, *args)
-    print type(d)
     if len(d)!=1:
         raise MultiColumnsError('Expect only one column.')
     return d.values()[0]
