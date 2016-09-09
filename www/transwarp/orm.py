@@ -1,10 +1,9 @@
+# coding: utf-8
 import time, logging
 import db
 
 class Field(object):
-
     _count = 0
-
     def __init__(self, **kw):
         self.name = kw.get('name', None)
         self._default = kw.get('default', None)
@@ -228,24 +227,31 @@ class Model(dict):
         return self
 
     def insert(self):
+        # 在insert之前进行处理，例如赋值给时间类的字段
         self.pre_insert and self.pre_insert()
         params = {}
         for k, v in self.__mappings__.iteritems():
+            # 检查字段是否可插入，不可插入则设置默认值
             if v.insertable:
                 if not hasattr(self, k):
                     setattr(self, k, v.default)
                 params[v.name] = getattr(self, k)
+        # 执行插入
         db.insert('%s' % self.__table__, **params)
         return self
 
-class User(Model):
-    id = IntegerField(primary_key=True)
-    name = StringField()
-    email = StringField(updatable=False)
-    passwd = StringField(default=lambda:'******')
-    last_modified = FloatField()
-    def pre_insert(self):
-        last_modified = time.time()
+
 
 if __name__=='__main__':
-    print User.__sql__
+    class User(Model):
+        id = IntegerField(primary_key=True)
+        name = StringField()
+        email = StringField(updatable=False)
+        passwd = StringField(default=lambda:'******')
+        last_modified = FloatField()
+        def pre_insert(self):
+            last_modified = time.time()
+    db.create_engine('root', 'root', 'crose')
+    u = User(a=1,id=10193, name='Michaelin', email='ormgg@db.org', passwd='12345678')
+    u.insert()
+    User.count_all()

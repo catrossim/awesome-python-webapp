@@ -115,9 +115,10 @@ def with_connection(func):
     @functools.wraps(func)
     def wrapper(*args, **kw):
         with connection():
-            func(*args, **kw)
+            return func(*args, **kw)
     return wrapper
 
+@with_connection
 def __select(sql, first, *args):
     global _db_ctx
     sql = sql.replace('?','%s')
@@ -127,35 +128,38 @@ def __select(sql, first, *args):
         cursor = _db_ctx.cursor()
         cursor.execute(sql,args)
         if cursor.description:
-            names = [x for x in cursor.description]
+            print cursor.description
+            names = [x[0] for x in cursor.description]
         if first:
             values = cursor.fetchone()
-            if not values:
+            print names,values
+            print values is not None
+            if values is None:
                 return None
             return Dict(names,values)
+        print "hahah"
         return [Dict(name,x) for x in cursor.fetchall()]
     finally:
         if cursor:
             cursor.close()
 
-@with_connection
 def select(sql, *args):
     return __select(sql, False, *args)
 
 class MultiColumnsError(DBError):
     pass
 
-@with_connection
 def select_one(sql, *args):
     return __select(sql, True, *args)
 
-@with_connection
 def select_int(sql, *args):
     d = __select(sql, True, *args)
+    print type(d)
     if len(d)!=1:
         raise MultiColumnsError('Expect only one column.')
     return d.values()[0]
 
+@with_connection
 def __update(sql, *args):
     global _db_ctx
     cursor = None
@@ -172,8 +176,7 @@ def __update(sql, *args):
         if cursor:
             cursor.close()
 
-@with_connection
-def insert(sql, *args):
+def insert(table, **kw):
     cols, args = zip(*kw.iteritems())
     sql = 'insert into `%s` (%s) values (%s)' \
         % (
@@ -183,7 +186,6 @@ def insert(sql, *args):
         )
     return __update(sql, *args)
 
-@with_connection
 def update(sql, *args):
     return __update(sql, *args)
 
@@ -225,7 +227,6 @@ class _TransactionCtx(object):
 if __name__=='__main__':
     logging.basicConfig(level=logging.DEBUG)
     create_engine('root', 'root', 'crose')
-    update('drop table if exists user')
-    update('create table user (id int primary key, name text, email text, passwd text, last_modified real)')
+    select_int('select count(*) from user')
     # import doctest
     # doctest.testmod()
