@@ -18,6 +18,23 @@ class Dict(dict):
     def __setattr__(self, key ,val):
         self[key] = val
 
+def next_id(t=None):
+    '''
+    Return next id as 50-char string.
+    Args:
+        t: unix timestamp, default to None and using time.time().
+    '''
+    if t is None:
+        t = time.time()
+    return '%015d%s000' % (int(t * 1000), uuid.uuid4().hex)
+
+def _profiling(start, sql=''):
+    t = time.time() - start
+    if t > 0.1:
+        logging.warning('[PROFILING] [DB] %s: %s' % (t, sql))
+    else:
+        logging.info('[PROFILING] [DB] %s: %s' % (t, sql))
+
 # 数据库引擎对象:
 class _Engine(object):
     def __init__(self, connect):
