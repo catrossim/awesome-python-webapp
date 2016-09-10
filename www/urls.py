@@ -5,5 +5,7 @@ from models import User, Blog, Comment
 @get('/')
 def test_user():
     users = User.find_all()
+    print dict(users=users)
     return dict(users=users)
+
     

@@ -37,3 +37,10 @@ class Comment(Model):
     user_image = StringField(ddl='varchar(500)')
     content = TextField()
     created_at = FloatField(updatable=False, default=time.time)
+
+if __name__=='__main__':
+    import config
+    from transwarp import db
+    db.create_engine(**config.configs.db)
+    user = User(id='10360',email='cat@house.com',password='1234',admin=True,name='lidong',image='/img/1.jpg')
+    user.insert()

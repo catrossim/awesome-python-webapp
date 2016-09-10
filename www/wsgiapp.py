@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# coding: utf-8
 # wsgiapp.py
 import logging; logging.basicConfig(level=logging.INFO)
 import os
@@ -22,4 +24,4 @@ wsgi.add_module(urls)
 
 # 在9000端口上启动本地测试服务器:
 if __name__ == '__main__':
-    wsgi.run(9000)
+    wsgi.run(9000, '0.0.0.0')
