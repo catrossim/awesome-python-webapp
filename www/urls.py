@@ -9,7 +9,7 @@ def test_user():
     print dict(users=users)
     return dict(users=users)
 
-@view('blogs.html')
+@api
 @get('/')
 def index():
     blogs = Blog.find_all()
