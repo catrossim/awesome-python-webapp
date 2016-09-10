@@ -42,5 +42,29 @@ if __name__=='__main__':
     import config
     from transwarp import db
     db.create_engine(**config.configs.db)
-    user = User(id='10360',email='cat@house.com',password='1234',admin=True,name='lidong',image='/img/1.jpg')
-    user.insert()
+    # user = User(id='10360',email='cat@house.com',password='1234',admin=True,name='lidong',image='/img/1.jpg')
+    # user.insert()
+    blog1 = Blog(
+        user_id='10360',
+        user_name='lidong',
+        user_image='/img/1.jpg',
+        name='Test',
+        summary='I am LiDong and come from China, majoring in CS.',
+        content='I am LiDong and come from China, majoring in CS. Happy to meet you')
+    blog1.insert()
+    blog2 = Blog(
+        user_id='10360',
+        user_name='lidong',
+        user_image='/img/1.jpg',
+        name='Test, Again',
+        summary='Again, I am LiDong and come from China, majoring in CS.',
+        content='Again,I am LiDong and come from China, majoring in CS. Happy to meet you')
+    blog2.insert()
+    blog3 = Blog(
+        user_id='10360',
+        user_name='lidong',
+        user_image='/img/1.jpg',
+        name='Test, Finally',
+        summary='Finally, I am LiDong and come from China, majoring in CS.',
+        content='Finally, I am LiDong and come from China, majoring in CS. Happy to meet you')
+    blog3.insert()
