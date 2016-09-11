@@ -42,4 +42,4 @@ def api(func):
             result = json.dumps(dict(error='internalerror', data=e.__class__.__name__, message=e.message))
         ctx.response.content_type = 'application/json'
         return result
-    return _wrapper
+    return wrapper
